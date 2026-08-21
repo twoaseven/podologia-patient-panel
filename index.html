@@ -399,4 +399,559 @@ async function handleRegister(e) {
         errorEl.textContent = '❌ A senha deve ter no mínimo 6 caracteres';
         errorEl.classList.remove('hidden');
         btn.disabled = false;
-        btn.textContent = 'C
+        btn.textContent = 'Cadastrar';
+        return;
+    }
+
+    try {
+        // 1. Criar usuário no Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: { 
+                    full_name: fullName,
+                    phone: phone
+                }
+            }
+        });
+        
+        if (error) throw error;
+
+        console.log('✅ Usuário criado:', data.user);
+
+        // 2. Criar perfil do paciente
+        if (data.user) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([{
+                    id: data.user.id,
+                    full_name: fullName,
+                    email: email,
+                    phone: phone || null
+                }]);
+            
+            if (profileError) {
+                console.error('⚠️ Erro ao criar perfil:', profileError);
+            } else {
+                console.log('✅ Perfil criado com sucesso!');
+            }
+        }
+
+        // 3. Mostrar mensagem de sucesso
+        successEl.textContent = '✅ Conta criada com sucesso! Faça login para continuar.';
+        successEl.classList.remove('hidden');
+        
+        // 4. Limpar formulário
+        document.getElementById('regFullName').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPhone').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+        
+        // 5. Voltar para tela de login após 3 segundos
+        setTimeout(() => {
+            showLogin();
+            // Mostrar mensagem de sucesso na tela de login
+            document.getElementById('loginSuccess').textContent = '✅ Conta criada! Faça login.';
+            document.getElementById('loginSuccess').classList.remove('hidden');
+        }, 3000);
+        
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar';
+        
+    } catch (err) {
+        console.error('❌ Erro no cadastro:', err.message);
+        errorEl.textContent = '❌ ' + err.message;
+        errorEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar';
+    }
+}
+
+// ============================================
+// PERFIL
+// ============================================
+
+async function loadProfile() {
+    if (!currentUser) return;
+    
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+    
+    if (!error && data) {
+        currentProfile = data;
+        console.log('✅ Perfil carregado:', currentProfile);
+    } else {
+        // Se não encontrar perfil, criar um
+        console.log('⚠️ Perfil não encontrado, criando...');
+        const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+                id: currentUser.id,
+                full_name: currentUser.user_metadata?.full_name || 'Paciente',
+                email: currentUser.email,
+                phone: currentUser.user_metadata?.phone || null
+            }])
+            .select()
+            .single();
+        
+        if (!insertError) {
+            currentProfile = newProfile;
+            console.log('✅ Perfil criado:', currentProfile);
+        }
+    }
+}
+
+// ============================================
+// LOGOUT
+// ============================================
+
+async function logout() {
+    if (confirm('Deseja sair?')) {
+        console.log('🚪 Saindo...');
+        await supabase.auth.signOut();
+        currentUser = null;
+        currentProfile = null;
+        currentAnamnesis = null;
+        allAppointments = [];
+        allSlots = [];
+        document.getElementById('appScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginSuccess').classList.add('hidden');
+        document.getElementById('loginError').classList.add('hidden');
+        console.log('✅ Logout realizado');
+    }
+}
+
+// ============================================
+// CARREGAR DADOS
+// ============================================
+
+async function loadAllData() {
+    await loadAppointments();
+    await loadSlots();
+    await loadAnamnesis();
+    renderAll();
+}
+
+async function loadAppointments() {
+    if (!currentUser) return;
+    
+    const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('patient_id', currentUser.id)
+        .order('appointment_date', { ascending: true });
+    
+    if (!error) {
+        allAppointments = data || [];
+        console.log('📅 Agendamentos carregados:', allAppointments.length);
+    }
+}
+
+async function loadSlots() {
+    const { data, error } = await supabase
+        .from('available_slots')
+        .select('*')
+        .eq('is_available', true)
+        .order('slot_date', { ascending: true });
+    
+    if (!error) {
+        allSlots = data || [];
+        console.log('🕐 Horários carregados:', allSlots.length);
+    }
+}
+
+async function loadAnamnesis() {
+    if (!currentUser) return;
+    
+    const { data, error } = await supabase
+        .from('anamnesis')
+        .select('*')
+        .eq('patient_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+    
+    if (!error && data && data.length > 0) {
+        currentAnamnesis = data[0];
+        console.log('📋 Anamnese carregada');
+    } else {
+        currentAnamnesis = null;
+        console.log('📋 Nenhuma anamnese encontrada');
+    }
+}
+
+// ============================================
+// RENDERIZAR (funções simplificadas)
+// ============================================
+
+function renderAll() {
+    renderDashboard();
+    renderAppointments();
+    renderAnamnesis();
+    renderHistory();
+    renderSlots();
+}
+
+function renderDashboard() {
+    const today = new Date().toISOString().split('T')[0];
+    const upcoming = allAppointments.filter(a => 
+        a.status !== 'cancelled' && 
+        a.status !== 'completed' && 
+        a.appointment_date >= today
+    );
+    
+    document.getElementById('upcomingCount').textContent = upcoming.length;
+    document.getElementById('totalCount').textContent = allAppointments.length;
+    document.getElementById('anamnesisStatus').textContent = currentAnamnesis ? '✅ Completa' : '❌ Pendente';
+
+    const container = document.getElementById('upcomingList');
+    if (upcoming.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280;">Nenhum agendamento próximo</p>';
+        return;
+    }
+    container.innerHTML = upcoming.map(a => `
+        <div class="appointment-item">
+            <div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <span>📅 ${formatDate(a.appointment_date)}</span>
+                    <span>🕐 ${formatTime(a.appointment_time)}</span>
+                    <span>📌 ${a.service_type}</span>
+                </div>
+                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
+            </div>
+            <span class="status-badge ${getStatusClass(a.status)}">${getStatusLabel(a.status)}</span>
+        </div>
+    `).join('');
+}
+
+function renderAppointments() {
+    const container = document.getElementById('allAppointments');
+    if (allAppointments.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280;">Nenhum agendamento encontrado</p>';
+        return;
+    }
+    container.innerHTML = allAppointments.map(a => `
+        <div class="appointment-item">
+            <div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <span>📅 ${formatDate(a.appointment_date)}</span>
+                    <span>🕐 ${formatTime(a.appointment_time)}</span>
+                    <span>📌 ${a.service_type}</span>
+                </div>
+                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span class="status-badge ${getStatusClass(a.status)}">${getStatusLabel(a.status)}</span>
+                ${a.status === 'pending' ? `<button class="btn-danger" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderHistory() {
+    const completed = allAppointments.filter(a => a.status === 'completed');
+    const container = document.getElementById('historyList');
+    if (completed.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280;">Nenhum atendimento concluído</p>';
+        return;
+    }
+    container.innerHTML = completed.map(a => `
+        <div class="appointment-item">
+            <div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <span>📅 ${formatDate(a.appointment_date)}</span>
+                    <span>🕐 ${formatTime(a.appointment_time)}</span>
+                    <span>📌 ${a.service_type}</span>
+                </div>
+                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
+            </div>
+            <span class="status-badge status-completed">✅ Concluído</span>
+        </div>
+    `).join('');
+}
+
+function renderSlots() {
+    const container = document.getElementById('slotsList');
+    if (allSlots.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280;">Nenhum horário disponível no momento</p>';
+        return;
+    }
+    container.innerHTML = `
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
+            ${allSlots.map(s => `
+                <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center;">
+                    <div style="font-weight:600;">📅 ${formatDate(s.slot_date)}</div>
+                    <div style="font-size:18px; font-weight:700; color:#2563eb;">${formatTime(s.slot_time)}</div>
+                    <span class="slot-available">✅ Disponível</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderAnamnesis() {
+    const container = document.getElementById('anamnesisContainer');
+    if (!currentAnamnesis) {
+        container.innerHTML = `
+            <form id="anamnesisForm" onsubmit="submitAnamnesis(event)">
+                <div class="form-group"><label>Histórico Médico</label><textarea id="amMedicalHistory" class="input-field" rows="2" placeholder="Descreva seu histórico médico"></textarea></div>
+                <div class="form-group"><label>Alergias</label><textarea id="amAllergies" class="input-field" rows="2" placeholder="Liste suas alergias"></textarea></div>
+                <div class="form-group"><label>Medicamentos em Uso</label><textarea id="amMedications" class="input-field" rows="2" placeholder="Medicamentos que você está usando"></textarea></div>
+                <div class="form-group"><label>Condições nos Pés</label><textarea id="amFootConditions" class="input-field" rows="2" placeholder="Descreva quaisquer condições nos pés"></textarea></div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
+                    <label><input type="checkbox" id="amDiabetes"> Diabetes</label>
+                    <label><input type="checkbox" id="amHypertension"> Hipertensão</label>
+                    <label><input type="checkbox" id="amCirculatory"> Problemas Circulatórios</label>
+                </div>
+                <button type="submit" class="btn-primary">Salvar Anamnese</button>
+            </form>
+        `;
+        return;
+    }
+    container.innerHTML = `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div><strong>Histórico Médico:</strong><br>${currentAnamnesis.medical_history || 'Não informado'}</div>
+            <div><strong>Alergias:</strong><br>${currentAnamnesis.allergies || 'Não informado'}</div>
+            <div><strong>Medicamentos:</strong><br>${currentAnamnesis.medications || 'Não informado'}</div>
+            <div><strong>Condições nos Pés:</strong><br>${currentAnamnesis.foot_conditions || 'Não informado'}</div>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+            ${currentAnamnesis.diabetes ? '<span class="status-badge status-confirmed">🩸 Diabetes</span>' : ''}
+            ${currentAnamnesis.hypertension ? '<span class="status-badge status-pending">❤️ Hipertensão</span>' : ''}
+            ${currentAnamnesis.circulatory_problems ? '<span class="status-badge status-cancelled">🔄 Problemas Circulatórios</span>' : ''}
+        </div>
+        <button class="btn-primary" style="margin-top:16px;" onclick="editAnamnesis()">✏️ Editar Anamnese</button>
+    `;
+}
+
+function editAnamnesis() {
+    const container = document.getElementById('anamnesisContainer');
+    container.innerHTML = `
+        <form id="anamnesisForm" onsubmit="submitAnamnesis(event)">
+            <div class="form-group"><label>Histórico Médico</label><textarea id="amMedicalHistory" class="input-field" rows="2">${currentAnamnesis?.medical_history || ''}</textarea></div>
+            <div class="form-group"><label>Alergias</label><textarea id="amAllergies" class="input-field" rows="2">${currentAnamnesis?.allergies || ''}</textarea></div>
+            <div class="form-group"><label>Medicamentos</label><textarea id="amMedications" class="input-field" rows="2">${currentAnamnesis?.medications || ''}</textarea></div>
+            <div class="form-group"><label>Condições nos Pés</label><textarea id="amFootConditions" class="input-field" rows="2">${currentAnamnesis?.foot_conditions || ''}</textarea></div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
+                <label><input type="checkbox" id="amDiabetes" ${currentAnamnesis?.diabetes ? 'checked' : ''}> Diabetes</label>
+                <label><input type="checkbox" id="amHypertension" ${currentAnamnesis?.hypertension ? 'checked' : ''}> Hipertensão</label>
+                <label><input type="checkbox" id="amCirculatory" ${currentAnamnesis?.circulatory_problems ? 'checked' : ''}> Problemas Circulatórios</label>
+            </div>
+            <button type="submit" class="btn-primary">Salvar Anamnese</button>
+            <button type="button" class="btn-secondary" style="margin-left:8px;" onclick="loadAnamnesis(); renderAnamnesis();">Cancelar</button>
+        </form>
+    `;
+}
+
+// ============================================
+// AÇÕES
+// ============================================
+
+async function submitAnamnesis(e) {
+    e.preventDefault();
+    
+    const data = {
+        patient_id: currentUser.id,
+        medical_history: document.getElementById('amMedicalHistory').value,
+        allergies: document.getElementById('amAllergies').value,
+        medications: document.getElementById('amMedications').value,
+        foot_conditions: document.getElementById('amFootConditions').value,
+        diabetes: document.getElementById('amDiabetes')?.checked || false,
+        hypertension: document.getElementById('amHypertension')?.checked || false,
+        circulatory_problems: document.getElementById('amCirculatory')?.checked || false,
+        observations: ''
+    };
+
+    let result;
+    if (currentAnamnesis) {
+        result = await supabase
+            .from('anamnesis')
+            .update(data)
+            .eq('id', currentAnamnesis.id);
+    } else {
+        result = await supabase
+            .from('anamnesis')
+            .insert([data]);
+    }
+
+    if (!result.error) {
+        showAlert('✅ Anamnese salva com sucesso!', 'green');
+        await loadAnamnesis();
+        renderAnamnesis();
+    } else {
+        showAlert('❌ Erro ao salvar anamnese: ' + result.error.message, 'red');
+    }
+}
+
+async function cancelAppointment(id) {
+    if (confirm('Cancelar este agendamento?')) {
+        const { error } = await supabase
+            .from('appointments')
+            .update({ status: 'cancelled' })
+            .eq('id', id);
+        
+        if (!error) {
+            showAlert('❌ Agendamento cancelado', 'red');
+            await loadAppointments();
+            renderAll();
+        }
+    }
+}
+
+function openNewAppointment() {
+    document.getElementById('modalTitle').textContent = '📅 Novo Agendamento';
+    document.getElementById('appDate').value = '';
+    document.getElementById('appTime').innerHTML = '<option value="">Selecione um horário</option>';
+    document.getElementById('appService').value = 'Consulta';
+    document.getElementById('appNotes').value = '';
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+}
+
+async function submitAppointment(e) {
+    e.preventDefault();
+    
+    const date = document.getElementById('appDate').value;
+    const time = document.getElementById('appTime').value;
+    const service = document.getElementById('appService').value;
+    const notes = document.getElementById('appNotes').value;
+
+    if (!date || !time) {
+        showAlert('⚠️ Preencha data e horário!', 'red');
+        return;
+    }
+
+    const { data, error } = await supabase
+        .from('appointments')
+        .insert([{
+            patient_id: currentUser.id,
+            appointment_date: date,
+            appointment_time: time,
+            service_type: service,
+            status: 'pending',
+            notes: notes
+        }]);
+
+    if (!error) {
+        closeModal();
+        showAlert('✅ Agendamento criado com sucesso!', 'green');
+        await loadAppointments();
+        renderAll();
+    } else {
+        showAlert('❌ Erro ao criar agendamento: ' + error.message, 'red');
+    }
+}
+
+// ============================================
+// UTILITÁRIOS
+// ============================================
+
+function getStatusLabel(status) {
+    const labels = { pending: 'Pendente', confirmed: 'Confirmado', completed: 'Concluído', cancelled: 'Cancelado' };
+    return labels[status] || status;
+}
+
+function getStatusClass(status) {
+    return 'status-' + status;
+}
+
+function formatDate(date) {
+    if (!date) return '';
+    const d = new Date(date + 'T00:00:00');
+    return d.toLocaleDateString('pt-BR');
+}
+
+function formatTime(time) {
+    return time ? time.substring(0, 5) : '';
+}
+
+function showAlert(message, type = 'blue') {
+    const el = document.getElementById('alertMessage');
+    el.textContent = message;
+    el.className = 'alert alert-' + type;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+// ============================================
+// CARREGAR HORÁRIOS DISPONÍVEIS NO MODAL
+// ============================================
+
+document.getElementById('appDate').addEventListener('change', function() {
+    const date = this.value;
+    const timeSelect = document.getElementById('appTime');
+    timeSelect.innerHTML = '<option value="">Carregando...</option>';
+    
+    if (date) {
+        const available = allSlots.filter(s => s.slot_date === date);
+        timeSelect.innerHTML = '<option value="">Selecione um horário</option>';
+        available.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.slot_time;
+            option.textContent = s.slot_time;
+            timeSelect.appendChild(option);
+        });
+        if (available.length === 0) {
+            timeSelect.innerHTML = '<option value="">Nenhum horário disponível</option>';
+        }
+    }
+});
+
+// ============================================
+// TABS
+// ============================================
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const tab = this.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        if (tab === 'anamnesis') renderAnamnesis();
+        if (tab === 'slots') renderSlots();
+    });
+});
+
+// ============================================
+// FECHAR MODAL AO CLICAR FORA
+// ============================================
+
+document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ============================================
+// VERIFICAR SESSÃO AO CARREGAR
+// ============================================
+
+async function checkSession() {
+    console.log('🔍 Verificando sessão...');
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+        console.log('✅ Usuário logado:', session.user.email);
+        currentUser = session.user;
+        await loadProfile();
+        showApp();
+    } else {
+        console.log('❌ Nenhum usuário logado');
+    }
+}
+
+// Iniciar
+checkSession();
+
+console.log('🦶 Podologia - Painel do Paciente carregado!');
+console.log('📌 Para testar: clique em "Não tem conta? Cadastre-se"');
+</script>
+
+</body>
+</html>
