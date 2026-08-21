@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦶 Podologia - Login e Cadastro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 440px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+        
+        .logo .emoji {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f9fafb;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            width: 100%;
+            padding: 12px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        }
+        
+        .btn-success:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .toggle-link {
+            text-align: center;
+            margin-top: 16px;
+        }
+        
+        .toggle-link button {
+            background: none;
+            border: none;
+            color: #4f46e5;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        
+        .toggle-link button:hover {
+            color: #4338ca;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .alert-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+        
+        .alert-success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+        
+        .alert-info {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #1e40af;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .input-icon {
+            position: relative;
+        }
+        
+        .input-icon input {
+            padding-left: 40px;
+        }
+        
+        .input-icon .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider::before {
+            margin-right: 12px;
+        }
+        
+        .divider::after {
+            margin-left: 12px;
+        }
+        
+        .password-hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                padding: 28px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <!-- ========================================== -->
+        <!-- LOGO -->
+        <!-- ========================================== -->
+        <div class="logo">
+            <span class="emoji">🦶</span>
+            <h1>Podologia</h1>
+        </div>
+        
+        <!-- ========================================== -->
+        <!-- TÍTULO DINÂMICO -->
+        <!-- ========================================== -->
+        <p class="subtitle" id="formTitle">Área do Paciente</p>
+
+        <!-- ========================================== -->
+        <!-- ALERTAS -->
+        <!-- ========================================== -->
+        <div id="alertError" class="alert alert-error hidden">
+            <span>⚠️</span>
+            <span id="errorMessage">Erro ao processar</span>
+        </div>
+        
+        <div id="alertSuccess" class="alert alert-success hidden">
+            <span>✅</span>
+            <span id="successMessage">Sucesso!</span>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FORMULÁRIO DE LOGIN -->
+        <!-- ========================================== -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label>📧 Email</label>
+                <div class="input-icon">
+                    <span class="icon">📧</span>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        placeholder="seu@email.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>🔒 Senha</label>
+                <div class="input-icon">
+                    <span class="icon">🔒</span>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        placeholder="••••••••" 
+                        required
+                        minlength="6"
+                        autocomplete="current-password"
+                    >
+                </div>
+                <div class="password-hint">Mínimo 6 caracteres</div>
+            </div>
+            
+            <button type="submit" id="loginBtn" class="btn-primary">
+                Entrar
+            </button>
+        </form>
+
+        <!-- ========================================== -->
+        <!-- FORMULÁRIO DE CADASTRO (INICIALMENTE OCULTO) -->
+        <!-- ========================================== -->
+        <form id="registerForm" class="hidden">
+            <div class="form-group">
+                <label>👤 Nome Completo</label>
+                <div class="input-icon">
+                    <span class="icon">👤</span>
+                    <input 
+                        type="text" 
+                        id="regFullName" 
+                        placeholder="Seu nome completo" 
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📧 Email</label>
+                <div class="input-icon">
+                    <span class="icon">📧</span>
+                    <input 
+                        type="email" 
+                        id="regEmail" 
+                        placeholder="seu@email.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📱 Telefone</label>
+                <div class="input-icon">
+                    <span class="icon">📱</span>
+                    <input 
+                        type="tel" 
+                        id="regPhone" 
+                        placeholder="(11) 99999-9999"
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>🔒 Senha</label>
+                <div class="input-icon">
+                    <span class="icon">🔒</span>
+                    <input 
+                        type="password" 
+                        id="regPassword" 
+                        placeholder="Mínimo 6 caracteres" 
+                        required
+                        minlength="6"
+                        autocomplete="new-password"
+                    >
+                </div>
+                <div class="password-hint">Mínimo 6 caracteres</div>
+            </div>
+            
+            <div class="form-group">
+                <label>🔒 Confirmar Senha</label>
+                <div class="input-icon">
+                    <span class="icon">🔒</span>
+                    <input 
+                        type="password" 
+                        id="regConfirmPassword" 
+                        placeholder="Confirme sua senha" 
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+            </div>
+            
+            <button type="submit" id="registerBtn" class="btn-success">
+                Cadastrar
+            </button>
+        </form>
+
+        <!-- ========================================== -->
+        <!-- LINK PARA ALTERNAR ENTRE LOGIN E CADASTRO -->
+        <!-- ========================================== -->
+        <div class="toggle-link">
+            <button id="toggleButton" onclick="toggleForm()">
+                Não tem conta? Cadastre-se
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- SCRIPT -->
+<!-- ========================================== -->
+<script>
+// ============================================
+// 🔑 CONFIGURAÇÃO DO SUPABASE
+// ============================================
+// ⚠️ SUBSTITUA PELAS SUAS CHAVES!
+const SUPABASE_URL = 'https://seu-projeto.supabase.co';
+const SUPABASE_ANON_KEY = 'sua-chave-anonima-aqui';
+
+// Criar cliente Supabase
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// 📌 VARIÁVEIS DE CONTROLE
+// ============================================
+let isLoginMode = true;
+
+// ============================================
+// 🔄 FUNÇÃO PARA ALTERNAR ENTRE LOGIN E CADASTRO
+// ============================================
+function toggleForm() {
+    isLoginMode = !isLoginMode;
+    
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const toggleBtn = document.getElementById('toggleButton');
+    const formTitle = document.getElementById('formTitle');
+    const alertError = document.getElementById('alertError');
+    const alertSuccess = document.getElementById('alertSuccess');
+    
+    // Esconder alertas
+    alertError.classList.add('hidden');
+    alertSuccess.classList.add('hidden');
+    
+    if (isLoginMode) {
+        // Mostrar Login
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        toggleBtn.textContent = 'Não tem conta? Cadastre-se';
+        formTitle.textContent = 'Área do Paciente';
+        document.querySelector('.btn-primary').textContent = 'Entrar';
+    } else {
+        // Mostrar Cadastro
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        toggleBtn.textContent = 'Já tem conta? Faça login';
+        formTitle.textContent = 'Criar nova conta';
+    }
+    
+    // Limpar campos
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    
+    console.log(`🔄 Modo: ${isLoginMode ? 'LOGIN' : 'CADASTRO'}`);
+}
+
+// ============================================
+// 🔐 FUNÇÃO DE LOGIN
+// ============================================
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errorEl = document.getElementById('alertError');
+    const errorMsg = document.getElementById('errorMessage');
+    const successEl = document.getElementById('alertSuccess');
+    const successMsg = document.getElementById('successMessage');
+    
+    // Resetar alertas
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+    
+    // Desabilitar botão
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Entrando...';
+    
+    try {
+        console.log('🔐 Tentando login com:', email);
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) throw error;
+        
+        console.log('✅ Login bem-sucedido!', data.user);
+        
+        // Mostrar sucesso
+        successMsg.textContent = '✅ Login realizado com sucesso!';
+        successEl.classList.remove('hidden');
+        
+        // Redirecionar para o dashboard após 2 segundos
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2000);
+        
+    } catch (err) {
+        console.error('❌ Erro no login:', err.message);
+        errorMsg.textContent = `❌ ${err.message}`;
+        errorEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = 'Entrar';
+    }
+}
+
+// ============================================
+// 📝 FUNÇÃO DE CADASTRO
+// ============================================
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    const fullName = document.getElementById('regFullName').value;
+    const email = document.getElementById('regEmail').value;
+    const phone = document.getElementById('regPhone').value;
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    
+    const btn = document.getElementById('registerBtn');
+    const errorEl = document.getElementById('alertError');
+    const errorMsg = document.getElementById('errorMessage');
+    const successEl = document.getElementById('alertSuccess');
+    const successMsg = document.getElementById('successMessage');
+    
+    // Resetar alertas
+    errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
+    
+    // Validar senhas
+    if (password !== confirmPassword) {
+        errorMsg.textContent = '❌ As senhas não coincidem';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+    
+    if (password.length < 6) {
+        errorMsg.textContent = '❌ A senha deve ter no mínimo 6 caracteres';
+        errorEl.classList.remove('hidden');
+        return;
+    }
+    
+    // Desabilitar botão
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Cadastrando...';
+    
+    try {
+        console.log('📝 Tentando cadastrar:', email);
+        
+        // 1. Criar usuário no Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    phone: phone
+                }
+            }
+        });
+        
+        if (error) throw error;
+        
+        console.log('✅ Usuário criado:', data.user);
+        
+        // 2. Criar perfil na tabela profiles
+        if (data.user) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([{
+                    id: data.user.id,
+                    full_name: fullName,
+                    email: email,
+                    phone: phone || null
+                }]);
+            
+            if (profileError) {
+                console.warn('⚠️ Erro ao criar perfil:', profileError);
+            } else {
+                console.log('✅ Perfil criado com sucesso!');
+            }
+        }
+        
+        // 3. Mostrar mensagem de sucesso
+        successMsg.textContent = '✅ Conta criada com sucesso! Faça login para continuar.';
+        successEl.classList.remove('hidden');
+        
+        // 4. Limpar formulário
+        document.getElementById('regFullName').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPhone').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+        
+        // 5. Voltar para tela de login após 3 segundos
+        setTimeout(() => {
+            // Voltar para o login
+            if (!isLoginMode) {
+                toggleForm();
+            }
+            // Mostrar mensagem na tela de login
+            document.getElementById('alertSuccess').classList.remove('hidden');
+            document.getElementById('successMessage').textContent = '✅ Conta criada! Faça login.';
+        }, 3000);
+        
+        btn.disabled = false;
+        btn.innerHTML = 'Cadastrar';
+        
+    } catch (err) {
+        console.error('❌ Erro no cadastro:', err.message);
+        errorMsg.textContent = `❌ ${err.message}`;
+        errorEl.classList.remov
