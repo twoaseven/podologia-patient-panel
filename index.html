@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; }
         .hidden { display: none !important; }
-        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; }
         .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
         .btn-primary { background: #2563eb; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
         .btn-primary:hover { background: #1d4ed8; }
@@ -19,15 +18,17 @@
         .btn-danger:hover { background: #b91c1c; }
         .btn-success { background: #16a34a; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
         .btn-success:hover { background: #15803d; }
+        .btn-secondary { background: #6b7280; color: white; padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-secondary:hover { background: #4b5563; }
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-confirmed { background: #dbeafe; color: #1e40af; }
         .status-completed { background: #d1fae5; color: #065f46; }
         .status-cancelled { background: #fee2e2; color: #991b1b; }
-        .input-field { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; margin-top: 4px; }
+        .input-field { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; margin-top: 4px; font-size: 14px; }
         .input-field:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
         .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 500; font-size: 14px; color: #374151; }
+        .form-group label { display: block; font-weight: 500; font-size: 14px; color: #374151; margin-bottom: 4px; }
         .navbar { background: white; padding: 16px 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .tab-bar { background: white; border-bottom: 1px solid #e5e7eb; display: flex; gap: 8px; padding: 0 24px; overflow-x: auto; }
         .tab-btn { padding: 12px 16px; border: none; background: none; cursor: pointer; font-weight: 500; color: #6b7280; border-bottom: 2px solid transparent; white-space: nowrap; }
@@ -52,22 +53,25 @@
         .alert-blue { background: #eff6ff; border-left: 4px solid #2563eb; color: #1e40af; }
         .alert-green { background: #f0fdf4; border-left: 4px solid #16a34a; color: #166534; }
         .alert-red { background: #fef2f2; border-left: 4px solid #dc2626; color: #991b1b; }
-        .login-container { max-width: 400px; margin: 80px auto; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .login-container h1 { text-align: center; font-size: 28px; color: #2563eb; margin-bottom: 8px; }
+        .login-container { max-width: 420px; margin: 40px auto; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .login-container h1 { text-align: center; font-size: 28px; color: #2563eb; margin-bottom: 4px; }
         .login-container h2 { text-align: center; font-size: 18px; color: #6b7280; margin-bottom: 24px; }
         .slot-available { background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-        .slot-unavailable { background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
         .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .navbar { flex-direction: column; align-items: stretch; } .tab-bar { padding: 0 12px; } .container { padding: 12px; } }
+        @media (max-width: 768px) { .navbar { flex-direction: column; align-items: stretch; } .tab-bar { padding: 0 12px; } .container { padding: 12px; } .login-container { margin: 20px 12px; padding: 20px; } }
+        .toggle-link { color: #2563eb; background: none; border: none; cursor: pointer; font-size: 14px; text-decoration: underline; }
+        .toggle-link:hover { color: #1d4ed8; }
     </style>
 </head>
 <body>
 
-<!-- ==================== TELA DE LOGIN ==================== -->
+<!-- ========================================== -->
+<!-- TELA DE LOGIN -->
+<!-- ========================================== -->
 <div id="loginScreen" class="login-container">
     <h1>🦶 Podologia</h1>
-    <h2 id="loginTitle">Área do Paciente</h2>
+    <h2>Área do Paciente</h2>
     
     <div id="loginError" class="hidden alert alert-red"></div>
     <div id="loginSuccess" class="hidden alert alert-green"></div>
@@ -85,13 +89,15 @@
     </form>
     
     <div style="text-align:center; margin-top:16px;">
-        <button onclick="showRegister()" style="color:#2563eb; background:none; border:none; cursor:pointer; font-size:14px;">
+        <button onclick="showRegister()" class="toggle-link">
             Não tem conta? Cadastre-se
         </button>
     </div>
 </div>
 
-<!-- ==================== TELA DE CADASTRO ==================== -->
+<!-- ========================================== -->
+<!-- TELA DE CADASTRO -->
+<!-- ========================================== -->
 <div id="registerScreen" class="login-container hidden">
     <h1>🦶 Podologia</h1>
     <h2>Cadastro do Paciente</h2>
@@ -101,11 +107,11 @@
     
     <form id="registerForm" onsubmit="handleRegister(event)">
         <div class="form-group">
-            <label>Nome Completo</label>
+            <label>Nome Completo *</label>
             <input type="text" id="regFullName" class="input-field" placeholder="Seu nome completo" required>
         </div>
         <div class="form-group">
-            <label>Email</label>
+            <label>Email *</label>
             <input type="email" id="regEmail" class="input-field" placeholder="seu@email.com" required>
         </div>
         <div class="form-group">
@@ -113,24 +119,26 @@
             <input type="tel" id="regPhone" class="input-field" placeholder="(11) 99999-9999">
         </div>
         <div class="form-group">
-            <label>Senha</label>
+            <label>Senha * (mínimo 6 caracteres)</label>
             <input type="password" id="regPassword" class="input-field" placeholder="Mínimo 6 caracteres" required minlength="6">
         </div>
         <div class="form-group">
-            <label>Confirmar Senha</label>
+            <label>Confirmar Senha *</label>
             <input type="password" id="regConfirmPassword" class="input-field" placeholder="Confirme sua senha" required>
         </div>
         <button type="submit" id="registerBtn" class="btn-success" style="width:100%;">Cadastrar</button>
     </form>
     
     <div style="text-align:center; margin-top:16px;">
-        <button onclick="showLogin()" style="color:#2563eb; background:none; border:none; cursor:pointer; font-size:14px;">
+        <button onclick="showLogin()" class="toggle-link">
             Já tem conta? Faça login
         </button>
     </div>
 </div>
 
-<!-- ==================== APP PRINCIPAL ==================== -->
+<!-- ========================================== -->
+<!-- APP PRINCIPAL -->
+<!-- ========================================== -->
 <div id="appScreen" class="hidden">
 
     <!-- NAVBAR -->
@@ -216,7 +224,9 @@
     </div>
 </div>
 
-<!-- ==================== MODAL ==================== -->
+<!-- ========================================== -->
+<!-- MODAL -->
+<!-- ========================================== -->
 <div id="modal" class="modal hidden">
     <div class="modal-content">
         <button class="modal-close" onclick="closeModal()">✕</button>
@@ -253,13 +263,16 @@
     </div>
 </div>
 
-<!-- ==================== SCRIPT ==================== -->
+<!-- ========================================== -->
+<!-- SCRIPT -->
+<!-- ========================================== -->
 <script>
 // ============================================
 // CONFIGURAÇÃO DO SUPABASE
 // ============================================
-const SUPABASE_URL = 'https://vlhklfpdgrdybwcfqodg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsaGtsZnBkZ3JkeWJ3Y2Zxb2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyODE0OTUsImV4cCI6MjEwMjg1NzQ5NX0.am4I6Smk87CL3H18uQ_vZGt8ZL8ExDO3kNwpzdQGFxM';
+// ⚠️ SUBSTITUA PELAS SUAS CHAVES DO SUPABASE!
+const SUPABASE_URL = 'https://seu-projeto.supabase.co';
+const SUPABASE_ANON_KEY = 'sua-chave-anonima-aqui';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -268,11 +281,38 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ============================================
 let currentUser = null;
 let currentProfile = null;
+let currentAnamnesis = null;
 let allAppointments = [];
 let allSlots = [];
 
 // ============================================
-// AUTENTICAÇÃO
+// FUNÇÕES DE TELA (LOGIN / CADASTRO)
+// ============================================
+
+function showLogin() {
+    document.getElementById('registerScreen').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('loginSuccess').classList.add('hidden');
+    document.getElementById('loginError').classList.add('hidden');
+}
+
+function showRegister() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('registerScreen').classList.remove('hidden');
+    document.getElementById('registerError').classList.add('hidden');
+    document.getElementById('registerSuccess').classList.add('hidden');
+}
+
+function showApp() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('registerScreen').classList.add('hidden');
+    document.getElementById('appScreen').classList.remove('hidden');
+    document.getElementById('userGreeting').textContent = `👋 Olá, ${currentProfile?.full_name || 'Paciente'}`;
+    loadAllData();
+}
+
+// ============================================
+// LOGIN
 // ============================================
 
 async function handleLogin(e) {
@@ -281,10 +321,12 @@ async function handleLogin(e) {
     const password = document.getElementById('loginPassword').value;
     const btn = document.getElementById('loginBtn');
     const errorEl = document.getElementById('loginError');
+    const successEl = document.getElementById('loginSuccess');
     
     btn.disabled = true;
     btn.textContent = 'Entrando...';
     errorEl.classList.add('hidden');
+    successEl.classList.add('hidden');
 
     try {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -301,13 +343,19 @@ async function handleLogin(e) {
     }
 }
 
+// ============================================
+// CADASTRO
+// ============================================
+
 async function handleRegister(e) {
     e.preventDefault();
+    
     const fullName = document.getElementById('regFullName').value;
     const email = document.getElementById('regEmail').value;
     const phone = document.getElementById('regPhone').value;
     const password = document.getElementById('regPassword').value;
     const confirmPassword = document.getElementById('regConfirmPassword').value;
+    
     const btn = document.getElementById('registerBtn');
     const errorEl = document.getElementById('registerError');
     const successEl = document.getElementById('registerSuccess');
@@ -317,6 +365,7 @@ async function handleRegister(e) {
     errorEl.classList.add('hidden');
     successEl.classList.add('hidden');
 
+    // Validar senhas
     if (password !== confirmPassword) {
         errorEl.textContent = '❌ As senhas não coincidem';
         errorEl.classList.remove('hidden');
@@ -325,31 +374,65 @@ async function handleRegister(e) {
         return;
     }
 
-    try {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { full_name: fullName, phone: phone }
-            }
-        });
-        if (error) throw error;
-
-        // Criar perfil
-        if (data.user) {
-            await supabase.from('profiles').insert({
-                id: data.user.id,
-                full_name: fullName,
-                email: email,
-                phone: phone || null
-            });
-        }
-
-        successEl.textContent = '✅ Conta criada com sucesso! Faça login.';
-        successEl.classList.remove('hidden');
-        showLogin();
+    if (password.length < 6) {
+        errorEl.textContent = '❌ A senha deve ter no mínimo 6 caracteres';
+        errorEl.classList.remove('hidden');
         btn.disabled = false;
         btn.textContent = 'Cadastrar';
+        return;
+    }
+
+    try {
+        // 1. Criar usuário no Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: { 
+                    full_name: fullName,
+                    phone: phone
+                }
+            }
+        });
+        
+        if (error) throw error;
+
+        // 2. Criar perfil do paciente
+        if (data.user) {
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([{
+                    id: data.user.id,
+                    full_name: fullName,
+                    email: email,
+                    phone: phone || null
+                }]);
+            
+            if (profileError) {
+                console.error('Erro ao criar perfil:', profileError);
+                // Mesmo com erro no perfil, o usuário foi criado
+            }
+        }
+
+        // 3. Mostrar mensagem de sucesso
+        successEl.textContent = '✅ Conta criada com sucesso! Faça login para continuar.';
+        successEl.classList.remove('hidden');
+        
+        // 4. Limpar formulário
+        document.getElementById('regFullName').value = '';
+        document.getElementById('regEmail').value = '';
+        document.getElementById('regPhone').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+        
+        // 5. Voltar para tela de login após 2 segundos
+        setTimeout(() => {
+            showLogin();
+        }, 2000);
+        
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar';
+        
     } catch (err) {
         errorEl.textContent = '❌ ' + err.message;
         errorEl.classList.remove('hidden');
@@ -358,46 +441,57 @@ async function handleRegister(e) {
     }
 }
 
+// ============================================
+// PERFIL
+// ============================================
+
 async function loadProfile() {
+    if (!currentUser) return;
+    
     const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
     
-    if (!error) {
+    if (!error && data) {
         currentProfile = data;
+    } else {
+        // Se não encontrar perfil, criar um
+        const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+                id: currentUser.id,
+                full_name: currentUser.user_metadata?.full_name || 'Paciente',
+                email: currentUser.email,
+                phone: currentUser.user_metadata?.phone || null
+            }])
+            .select()
+            .single();
+        
+        if (!insertError) {
+            currentProfile = newProfile;
+        }
     }
 }
+
+// ============================================
+// LOGOUT
+// ============================================
 
 async function logout() {
     if (confirm('Deseja sair?')) {
         await supabase.auth.signOut();
         currentUser = null;
         currentProfile = null;
+        currentAnamnesis = null;
+        allAppointments = [];
+        allSlots = [];
         document.getElementById('appScreen').classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginSuccess').classList.add('hidden');
+        document.getElementById('loginError').classList.add('hidden');
     }
-}
-
-function showRegister() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('registerScreen').classList.remove('hidden');
-    document.getElementById('loginTitle').textContent = '';
-}
-
-function showLogin() {
-    document.getElementById('registerScreen').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('loginTitle').textContent = 'Área do Paciente';
-}
-
-function showApp() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('registerScreen').classList.add('hidden');
-    document.getElementById('appScreen').classList.remove('hidden');
-    document.getElementById('userGreeting').textContent = `👋 Olá, ${currentProfile?.full_name || 'Paciente'}`;
-    loadAllData();
 }
 
 // ============================================
@@ -412,6 +506,8 @@ async function loadAllData() {
 }
 
 async function loadAppointments() {
+    if (!currentUser) return;
+    
     const { data, error } = await supabase
         .from('appointments')
         .select('*')
@@ -436,6 +532,8 @@ async function loadSlots() {
 }
 
 async function loadAnamnesis() {
+    if (!currentUser) return;
+    
     const { data, error } = await supabase
         .from('anamnesis')
         .select('*')
@@ -463,8 +561,11 @@ function renderAll() {
 }
 
 function renderDashboard() {
+    const today = new Date().toISOString().split('T')[0];
     const upcoming = allAppointments.filter(a => 
-        a.status !== 'cancelled' && a.status !== 'completed' && a.appointment_date >= new Date().toISOString().split('T')[0]
+        a.status !== 'cancelled' && 
+        a.status !== 'completed' && 
+        a.appointment_date >= today
     );
     
     document.getElementById('upcomingCount').textContent = upcoming.length;
@@ -605,7 +706,7 @@ function editAnamnesis() {
                 <label><input type="checkbox" id="amCirculatory" ${currentAnamnesis?.circulatory_problems ? 'checked' : ''}> Problemas Circulatórios</label>
             </div>
             <button type="submit" class="btn-primary">Salvar Anamnese</button>
-            <button type="button" class="btn-danger" style="margin-left:8px;" onclick="loadAnamnesis(); renderAnamnesis();">Cancelar</button>
+            <button type="button" class="btn-secondary" style="margin-left:8px;" onclick="loadAnamnesis(); renderAnamnesis();">Cancelar</button>
         </form>
     `;
 }
@@ -616,6 +717,7 @@ function editAnamnesis() {
 
 async function submitAnamnesis(e) {
     e.preventDefault();
+    
     const data = {
         patient_id: currentUser.id,
         medical_history: document.getElementById('amMedicalHistory').value,
@@ -679,6 +781,7 @@ function closeModal() {
 
 async function submitAppointment(e) {
     e.preventDefault();
+    
     const date = document.getElementById('appDate').value;
     const time = document.getElementById('appTime').value;
     const service = document.getElementById('appService').value;
@@ -805,8 +908,7 @@ async function checkSession() {
 checkSession();
 
 console.log('🦶 Podologia - Painel do Paciente com Supabase!');
-console.log('📅 Appointments:', allAppointments.length);
-console.log('📋 Anamnesis:', currentAnamnesis ? 'Completa' : 'Pendente');
+console.log('📋 Anamnese:', currentAnamnesis ? 'Completa' : 'Pendente');
 console.log('🕐 Slots disponíveis:', allSlots.length);
 </script>
 
