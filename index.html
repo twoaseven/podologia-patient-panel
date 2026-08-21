@@ -69,70 +69,74 @@
 <!-- ========================================== -->
 <!-- TELA DE LOGIN -->
 <!-- ========================================== -->
-<div id="loginScreen" class="login-container">
-    <h1>🦶 Podologia</h1>
-    <h2>Área do Paciente</h2>
-    
-    <div id="loginError" class="hidden alert alert-red"></div>
-    <div id="loginSuccess" class="hidden alert alert-green"></div>
-    
-    <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="loginEmail" class="input-field" placeholder="seu@email.com" required>
+<div id="loginScreen">
+    <div class="login-container">
+        <h1>🦶 Podologia</h1>
+        <h2>Área do Paciente</h2>
+        
+        <div id="loginError" class="hidden alert alert-red"></div>
+        <div id="loginSuccess" class="hidden alert alert-green"></div>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" class="input-field" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required minlength="6">
+            </div>
+            <button type="submit" id="loginBtn" class="btn-primary" style="width:100%;">Entrar</button>
+        </form>
+        
+        <div style="text-align:center; margin-top:16px;">
+            <button onclick="showRegister()" class="toggle-link" id="btnShowRegister">
+                Não tem conta? Cadastre-se
+            </button>
         </div>
-        <div class="form-group">
-            <label>Senha</label>
-            <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required minlength="6">
-        </div>
-        <button type="submit" id="loginBtn" class="btn-primary" style="width:100%;">Entrar</button>
-    </form>
-    
-    <div style="text-align:center; margin-top:16px;">
-        <button onclick="showRegister()" class="toggle-link">
-            Não tem conta? Cadastre-se
-        </button>
     </div>
 </div>
 
 <!-- ========================================== -->
 <!-- TELA DE CADASTRO -->
 <!-- ========================================== -->
-<div id="registerScreen" class="login-container hidden">
-    <h1>🦶 Podologia</h1>
-    <h2>Cadastro do Paciente</h2>
-    
-    <div id="registerError" class="hidden alert alert-red"></div>
-    <div id="registerSuccess" class="hidden alert alert-green"></div>
-    
-    <form id="registerForm" onsubmit="handleRegister(event)">
-        <div class="form-group">
-            <label>Nome Completo *</label>
-            <input type="text" id="regFullName" class="input-field" placeholder="Seu nome completo" required>
+<div id="registerScreen" class="hidden">
+    <div class="login-container">
+        <h1>🦶 Podologia</h1>
+        <h2>Cadastro do Paciente</h2>
+        
+        <div id="registerError" class="hidden alert alert-red"></div>
+        <div id="registerSuccess" class="hidden alert alert-green"></div>
+        
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label>Nome Completo *</label>
+                <input type="text" id="regFullName" class="input-field" placeholder="Seu nome completo" required>
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="regEmail" class="input-field" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>Telefone</label>
+                <input type="tel" id="regPhone" class="input-field" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+                <label>Senha * (mínimo 6 caracteres)</label>
+                <input type="password" id="regPassword" class="input-field" placeholder="Mínimo 6 caracteres" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label>Confirmar Senha *</label>
+                <input type="password" id="regConfirmPassword" class="input-field" placeholder="Confirme sua senha" required>
+            </div>
+            <button type="submit" id="registerBtn" class="btn-success" style="width:100%;">Cadastrar</button>
+        </form>
+        
+        <div style="text-align:center; margin-top:16px;">
+            <button onclick="showLogin()" class="toggle-link" id="btnShowLogin">
+                Já tem conta? Faça login
+            </button>
         </div>
-        <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="regEmail" class="input-field" placeholder="seu@email.com" required>
-        </div>
-        <div class="form-group">
-            <label>Telefone</label>
-            <input type="tel" id="regPhone" class="input-field" placeholder="(11) 99999-9999">
-        </div>
-        <div class="form-group">
-            <label>Senha * (mínimo 6 caracteres)</label>
-            <input type="password" id="regPassword" class="input-field" placeholder="Mínimo 6 caracteres" required minlength="6">
-        </div>
-        <div class="form-group">
-            <label>Confirmar Senha *</label>
-            <input type="password" id="regConfirmPassword" class="input-field" placeholder="Confirme sua senha" required>
-        </div>
-        <button type="submit" id="registerBtn" class="btn-success" style="width:100%;">Cadastrar</button>
-    </form>
-    
-    <div style="text-align:center; margin-top:16px;">
-        <button onclick="showLogin()" class="toggle-link">
-            Já tem conta? Faça login
-        </button>
     </div>
 </div>
 
@@ -274,10 +278,11 @@
 const SUPABASE_URL = 'https://vlhklfpdgrdybwcfqodg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsaGtsZnBkZ3JkeWJ3Y2Zxb2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyODE0OTUsImV4cCI6MjEwMjg1NzQ5NX0.am4I6Smk87CL3H18uQ_vZGt8ZL8ExDO3kNwpzdQGFxM';
 
+// Criar cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
-// VARIÁVEIS GLOBAIS
+// VARIÁVEIS
 // ============================================
 let currentUser = null;
 let currentProfile = null;
@@ -286,10 +291,11 @@ let allAppointments = [];
 let allSlots = [];
 
 // ============================================
-// FUNÇÕES DE TELA (LOGIN / CADASTRO)
+// FUNÇÕES DE TELA - CORRIGIDAS!
 // ============================================
 
 function showLogin() {
+    console.log('🔄 Mostrando tela de Login');
     document.getElementById('registerScreen').classList.add('hidden');
     document.getElementById('loginScreen').classList.remove('hidden');
     document.getElementById('loginSuccess').classList.add('hidden');
@@ -297,6 +303,7 @@ function showLogin() {
 }
 
 function showRegister() {
+    console.log('🔄 Mostrando tela de Cadastro');
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('registerScreen').classList.remove('hidden');
     document.getElementById('registerError').classList.add('hidden');
@@ -304,6 +311,7 @@ function showRegister() {
 }
 
 function showApp() {
+    console.log('🔄 Mostrando App Principal');
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('registerScreen').classList.add('hidden');
     document.getElementById('appScreen').classList.remove('hidden');
@@ -312,11 +320,21 @@ function showApp() {
 }
 
 // ============================================
+// TESTE - Verificar se as funções existem
+// ============================================
+console.log('✅ showLogin:', typeof showLogin);
+console.log('✅ showRegister:', typeof showRegister);
+console.log('✅ handleLogin:', typeof handleLogin);
+console.log('✅ handleRegister:', typeof handleRegister);
+
+// ============================================
 // LOGIN
 // ============================================
 
 async function handleLogin(e) {
     e.preventDefault();
+    console.log('🔐 Tentando login...');
+    
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     const btn = document.getElementById('loginBtn');
@@ -332,10 +350,12 @@ async function handleLogin(e) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         
+        console.log('✅ Login bem-sucedido!');
         currentUser = data.user;
         await loadProfile();
         showApp();
     } catch (err) {
+        console.error('❌ Erro no login:', err.message);
         errorEl.textContent = '❌ ' + err.message;
         errorEl.classList.remove('hidden');
         btn.disabled = false;
@@ -344,11 +364,12 @@ async function handleLogin(e) {
 }
 
 // ============================================
-// CADASTRO
+// CADASTRO - CORRIGIDO!
 // ============================================
 
 async function handleRegister(e) {
     e.preventDefault();
+    console.log('📝 Tentando cadastrar...');
     
     const fullName = document.getElementById('regFullName').value;
     const email = document.getElementById('regEmail').value;
@@ -378,539 +399,4 @@ async function handleRegister(e) {
         errorEl.textContent = '❌ A senha deve ter no mínimo 6 caracteres';
         errorEl.classList.remove('hidden');
         btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-        return;
-    }
-
-    try {
-        // 1. Criar usuário no Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: { 
-                    full_name: fullName,
-                    phone: phone
-                }
-            }
-        });
-        
-        if (error) throw error;
-
-        // 2. Criar perfil do paciente
-        if (data.user) {
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert([{
-                    id: data.user.id,
-                    full_name: fullName,
-                    email: email,
-                    phone: phone || null
-                }]);
-            
-            if (profileError) {
-                console.error('Erro ao criar perfil:', profileError);
-                // Mesmo com erro no perfil, o usuário foi criado
-            }
-        }
-
-        // 3. Mostrar mensagem de sucesso
-        successEl.textContent = '✅ Conta criada com sucesso! Faça login para continuar.';
-        successEl.classList.remove('hidden');
-        
-        // 4. Limpar formulário
-        document.getElementById('regFullName').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPhone').value = '';
-        document.getElementById('regPassword').value = '';
-        document.getElementById('regConfirmPassword').value = '';
-        
-        // 5. Voltar para tela de login após 2 segundos
-        setTimeout(() => {
-            showLogin();
-        }, 2000);
-        
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-        
-    } catch (err) {
-        errorEl.textContent = '❌ ' + err.message;
-        errorEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-    }
-}
-
-// ============================================
-// PERFIL
-// ============================================
-
-async function loadProfile() {
-    if (!currentUser) return;
-    
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', currentUser.id)
-        .maybeSingle();
-    
-    if (!error && data) {
-        currentProfile = data;
-    } else {
-        // Se não encontrar perfil, criar um
-        const { data: newProfile, error: insertError } = await supabase
-            .from('profiles')
-            .insert([{
-                id: currentUser.id,
-                full_name: currentUser.user_metadata?.full_name || 'Paciente',
-                email: currentUser.email,
-                phone: currentUser.user_metadata?.phone || null
-            }])
-            .select()
-            .single();
-        
-        if (!insertError) {
-            currentProfile = newProfile;
-        }
-    }
-}
-
-// ============================================
-// LOGOUT
-// ============================================
-
-async function logout() {
-    if (confirm('Deseja sair?')) {
-        await supabase.auth.signOut();
-        currentUser = null;
-        currentProfile = null;
-        currentAnamnesis = null;
-        allAppointments = [];
-        allSlots = [];
-        document.getElementById('appScreen').classList.add('hidden');
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('loginSuccess').classList.add('hidden');
-        document.getElementById('loginError').classList.add('hidden');
-    }
-}
-
-// ============================================
-// CARREGAR DADOS
-// ============================================
-
-async function loadAllData() {
-    await loadAppointments();
-    await loadSlots();
-    await loadAnamnesis();
-    renderAll();
-}
-
-async function loadAppointments() {
-    if (!currentUser) return;
-    
-    const { data, error } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('patient_id', currentUser.id)
-        .order('appointment_date', { ascending: true });
-    
-    if (!error) {
-        allAppointments = data || [];
-    }
-}
-
-async function loadSlots() {
-    const { data, error } = await supabase
-        .from('available_slots')
-        .select('*')
-        .eq('is_available', true)
-        .order('slot_date', { ascending: true });
-    
-    if (!error) {
-        allSlots = data || [];
-    }
-}
-
-async function loadAnamnesis() {
-    if (!currentUser) return;
-    
-    const { data, error } = await supabase
-        .from('anamnesis')
-        .select('*')
-        .eq('patient_id', currentUser.id)
-        .order('created_at', { ascending: false })
-        .limit(1);
-    
-    if (!error && data && data.length > 0) {
-        currentAnamnesis = data[0];
-    } else {
-        currentAnamnesis = null;
-    }
-}
-
-// ============================================
-// RENDERIZAR
-// ============================================
-
-function renderAll() {
-    renderDashboard();
-    renderAppointments();
-    renderAnamnesis();
-    renderHistory();
-    renderSlots();
-}
-
-function renderDashboard() {
-    const today = new Date().toISOString().split('T')[0];
-    const upcoming = allAppointments.filter(a => 
-        a.status !== 'cancelled' && 
-        a.status !== 'completed' && 
-        a.appointment_date >= today
-    );
-    
-    document.getElementById('upcomingCount').textContent = upcoming.length;
-    document.getElementById('totalCount').textContent = allAppointments.length;
-    document.getElementById('anamnesisStatus').textContent = currentAnamnesis ? '✅ Completa' : '❌ Pendente';
-
-    const container = document.getElementById('upcomingList');
-    if (upcoming.length === 0) {
-        container.innerHTML = '<p style="color: #6b7280;">Nenhum agendamento próximo</p>';
-        return;
-    }
-    container.innerHTML = upcoming.map(a => `
-        <div class="appointment-item">
-            <div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <span>📅 ${formatDate(a.appointment_date)}</span>
-                    <span>🕐 ${formatTime(a.appointment_time)}</span>
-                    <span>📌 ${a.service_type}</span>
-                </div>
-                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
-            </div>
-            <span class="status-badge ${getStatusClass(a.status)}">${getStatusLabel(a.status)}</span>
-        </div>
-    `).join('');
-}
-
-function renderAppointments() {
-    const container = document.getElementById('allAppointments');
-    if (allAppointments.length === 0) {
-        container.innerHTML = '<p style="color: #6b7280;">Nenhum agendamento encontrado</p>';
-        return;
-    }
-    container.innerHTML = allAppointments.map(a => `
-        <div class="appointment-item">
-            <div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <span>📅 ${formatDate(a.appointment_date)}</span>
-                    <span>🕐 ${formatTime(a.appointment_time)}</span>
-                    <span>📌 ${a.service_type}</span>
-                </div>
-                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
-            </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <span class="status-badge ${getStatusClass(a.status)}">${getStatusLabel(a.status)}</span>
-                ${a.status === 'pending' ? `<button class="btn-danger" onclick="cancelAppointment('${a.id}')">Cancelar</button>` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-function renderHistory() {
-    const completed = allAppointments.filter(a => a.status === 'completed');
-    const container = document.getElementById('historyList');
-    if (completed.length === 0) {
-        container.innerHTML = '<p style="color: #6b7280;">Nenhum atendimento concluído</p>';
-        return;
-    }
-    container.innerHTML = completed.map(a => `
-        <div class="appointment-item">
-            <div>
-                <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                    <span>📅 ${formatDate(a.appointment_date)}</span>
-                    <span>🕐 ${formatTime(a.appointment_time)}</span>
-                    <span>📌 ${a.service_type}</span>
-                </div>
-                ${a.notes ? `<div style="font-size:14px; color:#6b7280; margin-top:4px;">📝 ${a.notes}</div>` : ''}
-            </div>
-            <span class="status-badge status-completed">✅ Concluído</span>
-        </div>
-    `).join('');
-}
-
-function renderSlots() {
-    const container = document.getElementById('slotsList');
-    if (allSlots.length === 0) {
-        container.innerHTML = '<p style="color: #6b7280;">Nenhum horário disponível no momento</p>';
-        return;
-    }
-    container.innerHTML = `
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
-            ${allSlots.map(s => `
-                <div style="background:white; border:1px solid #e5e7eb; border-radius:8px; padding:12px; text-align:center;">
-                    <div style="font-weight:600;">📅 ${formatDate(s.slot_date)}</div>
-                    <div style="font-size:18px; font-weight:700; color:#2563eb;">${formatTime(s.slot_time)}</div>
-                    <span class="slot-available">✅ Disponível</span>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-function renderAnamnesis() {
-    const container = document.getElementById('anamnesisContainer');
-    if (!currentAnamnesis) {
-        container.innerHTML = `
-            <form id="anamnesisForm" onsubmit="submitAnamnesis(event)">
-                <div class="form-group"><label>Histórico Médico</label><textarea id="amMedicalHistory" class="input-field" rows="2" placeholder="Descreva seu histórico médico"></textarea></div>
-                <div class="form-group"><label>Alergias</label><textarea id="amAllergies" class="input-field" rows="2" placeholder="Liste suas alergias"></textarea></div>
-                <div class="form-group"><label>Medicamentos em Uso</label><textarea id="amMedications" class="input-field" rows="2" placeholder="Medicamentos que você está usando"></textarea></div>
-                <div class="form-group"><label>Condições nos Pés</label><textarea id="amFootConditions" class="input-field" rows="2" placeholder="Descreva quaisquer condições nos pés"></textarea></div>
-                <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
-                    <label><input type="checkbox" id="amDiabetes"> Diabetes</label>
-                    <label><input type="checkbox" id="amHypertension"> Hipertensão</label>
-                    <label><input type="checkbox" id="amCirculatory"> Problemas Circulatórios</label>
-                </div>
-                <button type="submit" class="btn-primary">Salvar Anamnese</button>
-            </form>
-        `;
-        return;
-    }
-    container.innerHTML = `
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-            <div><strong>Histórico Médico:</strong><br>${currentAnamnesis.medical_history || 'Não informado'}</div>
-            <div><strong>Alergias:</strong><br>${currentAnamnesis.allergies || 'Não informado'}</div>
-            <div><strong>Medicamentos:</strong><br>${currentAnamnesis.medications || 'Não informado'}</div>
-            <div><strong>Condições nos Pés:</strong><br>${currentAnamnesis.foot_conditions || 'Não informado'}</div>
-        </div>
-        <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
-            ${currentAnamnesis.diabetes ? '<span class="status-badge status-confirmed">🩸 Diabetes</span>' : ''}
-            ${currentAnamnesis.hypertension ? '<span class="status-badge status-pending">❤️ Hipertensão</span>' : ''}
-            ${currentAnamnesis.circulatory_problems ? '<span class="status-badge status-cancelled">🔄 Problemas Circulatórios</span>' : ''}
-        </div>
-        <button class="btn-primary" style="margin-top:16px;" onclick="editAnamnesis()">✏️ Editar Anamnese</button>
-    `;
-}
-
-function editAnamnesis() {
-    const container = document.getElementById('anamnesisContainer');
-    container.innerHTML = `
-        <form id="anamnesisForm" onsubmit="submitAnamnesis(event)">
-            <div class="form-group"><label>Histórico Médico</label><textarea id="amMedicalHistory" class="input-field" rows="2">${currentAnamnesis?.medical_history || ''}</textarea></div>
-            <div class="form-group"><label>Alergias</label><textarea id="amAllergies" class="input-field" rows="2">${currentAnamnesis?.allergies || ''}</textarea></div>
-            <div class="form-group"><label>Medicamentos</label><textarea id="amMedications" class="input-field" rows="2">${currentAnamnesis?.medications || ''}</textarea></div>
-            <div class="form-group"><label>Condições nos Pés</label><textarea id="amFootConditions" class="input-field" rows="2">${currentAnamnesis?.foot_conditions || ''}</textarea></div>
-            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
-                <label><input type="checkbox" id="amDiabetes" ${currentAnamnesis?.diabetes ? 'checked' : ''}> Diabetes</label>
-                <label><input type="checkbox" id="amHypertension" ${currentAnamnesis?.hypertension ? 'checked' : ''}> Hipertensão</label>
-                <label><input type="checkbox" id="amCirculatory" ${currentAnamnesis?.circulatory_problems ? 'checked' : ''}> Problemas Circulatórios</label>
-            </div>
-            <button type="submit" class="btn-primary">Salvar Anamnese</button>
-            <button type="button" class="btn-secondary" style="margin-left:8px;" onclick="loadAnamnesis(); renderAnamnesis();">Cancelar</button>
-        </form>
-    `;
-}
-
-// ============================================
-// AÇÕES
-// ============================================
-
-async function submitAnamnesis(e) {
-    e.preventDefault();
-    
-    const data = {
-        patient_id: currentUser.id,
-        medical_history: document.getElementById('amMedicalHistory').value,
-        allergies: document.getElementById('amAllergies').value,
-        medications: document.getElementById('amMedications').value,
-        foot_conditions: document.getElementById('amFootConditions').value,
-        diabetes: document.getElementById('amDiabetes')?.checked || false,
-        hypertension: document.getElementById('amHypertension')?.checked || false,
-        circulatory_problems: document.getElementById('amCirculatory')?.checked || false,
-        observations: ''
-    };
-
-    let result;
-    if (currentAnamnesis) {
-        result = await supabase
-            .from('anamnesis')
-            .update(data)
-            .eq('id', currentAnamnesis.id);
-    } else {
-        result = await supabase
-            .from('anamnesis')
-            .insert([data]);
-    }
-
-    if (!result.error) {
-        showAlert('✅ Anamnese salva com sucesso!', 'green');
-        await loadAnamnesis();
-        renderAnamnesis();
-    } else {
-        showAlert('❌ Erro ao salvar anamnese: ' + result.error.message, 'red');
-    }
-}
-
-async function cancelAppointment(id) {
-    if (confirm('Cancelar este agendamento?')) {
-        const { error } = await supabase
-            .from('appointments')
-            .update({ status: 'cancelled' })
-            .eq('id', id);
-        
-        if (!error) {
-            showAlert('❌ Agendamento cancelado', 'red');
-            await loadAppointments();
-            renderAll();
-        }
-    }
-}
-
-function openNewAppointment() {
-    document.getElementById('modalTitle').textContent = '📅 Novo Agendamento';
-    document.getElementById('appDate').value = '';
-    document.getElementById('appTime').innerHTML = '<option value="">Selecione um horário</option>';
-    document.getElementById('appService').value = 'Consulta';
-    document.getElementById('appNotes').value = '';
-    document.getElementById('modal').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('modal').classList.add('hidden');
-}
-
-async function submitAppointment(e) {
-    e.preventDefault();
-    
-    const date = document.getElementById('appDate').value;
-    const time = document.getElementById('appTime').value;
-    const service = document.getElementById('appService').value;
-    const notes = document.getElementById('appNotes').value;
-
-    if (!date || !time) {
-        showAlert('⚠️ Preencha data e horário!', 'red');
-        return;
-    }
-
-    const { data, error } = await supabase
-        .from('appointments')
-        .insert([{
-            patient_id: currentUser.id,
-            appointment_date: date,
-            appointment_time: time,
-            service_type: service,
-            status: 'pending',
-            notes: notes
-        }]);
-
-    if (!error) {
-        closeModal();
-        showAlert('✅ Agendamento criado com sucesso!', 'green');
-        await loadAppointments();
-        renderAll();
-    } else {
-        showAlert('❌ Erro ao criar agendamento: ' + error.message, 'red');
-    }
-}
-
-// ============================================
-// UTILITÁRIOS
-// ============================================
-
-function getStatusLabel(status) {
-    const labels = { pending: 'Pendente', confirmed: 'Confirmado', completed: 'Concluído', cancelled: 'Cancelado' };
-    return labels[status] || status;
-}
-
-function getStatusClass(status) {
-    return 'status-' + status;
-}
-
-function formatDate(date) {
-    if (!date) return '';
-    const d = new Date(date + 'T00:00:00');
-    return d.toLocaleDateString('pt-BR');
-}
-
-function formatTime(time) {
-    return time ? time.substring(0, 5) : '';
-}
-
-function showAlert(message, type = 'blue') {
-    const el = document.getElementById('alertMessage');
-    el.textContent = message;
-    el.className = 'alert alert-' + type;
-    el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 4000);
-}
-
-// ============================================
-// CARREGAR HORÁRIOS DISPONÍVEIS NO MODAL
-// ============================================
-
-document.getElementById('appDate').addEventListener('change', function() {
-    const date = this.value;
-    const timeSelect = document.getElementById('appTime');
-    timeSelect.innerHTML = '<option value="">Carregando...</option>';
-    
-    if (date) {
-        const available = allSlots.filter(s => s.slot_date === date);
-        timeSelect.innerHTML = '<option value="">Selecione um horário</option>';
-        available.forEach(s => {
-            const option = document.createElement('option');
-            option.value = s.slot_time;
-            option.textContent = s.slot_time;
-            timeSelect.appendChild(option);
-        });
-        if (available.length === 0) {
-            timeSelect.innerHTML = '<option value="">Nenhum horário disponível</option>';
-        }
-    }
-});
-
-// ============================================
-// TABS
-// ============================================
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        const tab = this.dataset.tab;
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-        document.getElementById('tab-' + tab).classList.remove('hidden');
-        if (tab === 'anamnesis') renderAnamnesis();
-        if (tab === 'slots') renderSlots();
-    });
-});
-
-// ============================================
-// FECHAR MODAL AO CLICAR FORA
-// ============================================
-
-document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
-
-// ============================================
-// VERIFICAR SESSÃO AO CARREGAR
-// ============================================
-
-async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-        currentUser = session.user;
-        await loadProfile();
-        showApp();
-    }
-}
-
-checkSession();
-
-console.log('🦶 Podologia - Painel do Paciente com Supabase!');
-console.log('📋 Anamnese:', currentAnamnesis ? 'Completa' : 'Pendente');
-console.log('🕐 Slots disponíveis:', allSlots.length);
-</script>
-
-</body>
-</html>
+        btn.textContent = 'C
